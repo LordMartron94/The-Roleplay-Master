@@ -1,7 +1,8 @@
 ﻿using System.Windows;
 using Caliburn.Micro;
+using MD.RPM.Frontend.Windows.ViewModels;
 
-namespace MD.RPM.Frontend.Windows.ViewModels;
+namespace MD.RPM.Frontend.Windows;
 
 public class Bootstrapper : BootstrapperBase
 {
