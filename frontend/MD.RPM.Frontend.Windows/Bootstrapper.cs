@@ -20,10 +20,11 @@ public class Bootstrapper : BootstrapperBase
     protected override void Configure()
     {
         _container.Instance(_container);
-        
+
         _container
             .Singleton<IWindowManager, WindowManager>()
-            .Singleton<IEventAggregator, EventAggregator>();
+            .Singleton<IEventAggregator, EventAggregator>()
+            .Singleton<IScreenManager, ScreenManager>();
         
         GetType().Assembly.GetTypes()
             .Where(type => type.IsClass)
@@ -31,11 +32,15 @@ public class Bootstrapper : BootstrapperBase
             .ToList()
             .ForEach(viewModelType => _container.RegisterPerRequest(
                 viewModelType, viewModelType.ToString(), viewModelType));
+        
+        _container.GetInstance<IScreenManager>().Initialize(_container);
     }
     
     protected override void OnStartup(object sender, StartupEventArgs e)
     { 
         DisplayRootViewForAsync<ShellViewModel>();
+        IScreenManager? screenManager = _container.GetInstance<IScreenManager>();
+        screenManager.ChangeScreen(AppScreen.HomeScreen);
     }
     
     protected override void OnExit(object sender, EventArgs e)

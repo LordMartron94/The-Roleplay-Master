@@ -5,14 +5,9 @@ namespace MD.RPM.Frontend.Windows.ViewModels;
 
 public class ShellViewModel : Conductor<object>
 {
-    private HomeScreenViewModel _homeScreenViewModel;
-    
-    public ShellViewModel(HomeScreenViewModel homeScreenViewModel)
+    public ShellViewModel(IScreenManager screenManager)
     {
-        _homeScreenViewModel = homeScreenViewModel;
-        
-        // ReSharper disable once VirtualMemberCallInConstructor
-        ActivateItemAsync(homeScreenViewModel);
+        screenManager.SubscribeToScreenChange(ChangeActiveItem);
         
         SoftwareStateManager softwareStateManager = SoftwareStateManager.Instance;
         
@@ -20,5 +15,11 @@ public class ShellViewModel : Conductor<object>
         {
             TryCloseAsync();
         });
+    }
+
+    private void ChangeActiveItem(Screen screen)
+    {
+        Console.WriteLine($"Active screen changed to {screen.GetType().Name}");
+        ActivateItemAsync(screen);
     }
 }

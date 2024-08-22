@@ -6,10 +6,13 @@ namespace MD.RPM.Frontend.Windows.ViewModels;
 public class HomeScreenViewModel : Screen
 {
     private readonly SoftwareStateManager _softwareStateManager;
+    private readonly IScreenManager _screenManager;
     
-    public HomeScreenViewModel()
+    public HomeScreenViewModel(IScreenManager screenManager)
     {
         _softwareStateManager = SoftwareStateManager.Instance;
+
+        _screenManager = screenManager ?? throw new ArgumentNullException(nameof(screenManager));
     }
 
     public void StartNewGame()
@@ -29,7 +32,7 @@ public class HomeScreenViewModel : Screen
     
     public void Credits()
     {
-        Console.WriteLine("Credits...");
+        _screenManager.ChangeScreen(AppScreen.CreditsScreen);
     }
     
     public void Options()
