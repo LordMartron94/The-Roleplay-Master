@@ -19,7 +19,6 @@ public class ShellViewModel : Conductor<object>
 
     private void ChangeActiveItem(Screen screen)
     {
-        Console.WriteLine($"Active screen changed to {screen.GetType().Name}");
         ActivateItemAsync(screen);
     }
 }

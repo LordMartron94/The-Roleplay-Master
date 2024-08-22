@@ -53,8 +53,6 @@ public sealed class ScreenManager : IScreenManager
         if (!_initialized)
             throw new InvalidOperationException("ScreenManager has not been initialized. Initialize it before calling ChangeScreen.");
         
-        Console.WriteLine($"Changing screen to {screen}...");
-        
         if (_currentScreen != null)
             await _currentScreen.DeactivateAsync(false);
 
