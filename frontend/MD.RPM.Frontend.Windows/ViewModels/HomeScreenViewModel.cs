@@ -1,12 +1,15 @@
 ﻿using Caliburn.Micro;
+using MD.Common.SoftwareStateHandling;
 
 namespace MD.RPM.Frontend.Windows.ViewModels;
 
 public class HomeScreenViewModel : Screen
 {
+    private readonly SoftwareStateManager _softwareStateManager;
+    
     public HomeScreenViewModel()
     {
-        
+        _softwareStateManager = SoftwareStateManager.Instance;
     }
 
     public void StartNewGame()
@@ -21,7 +24,7 @@ public class HomeScreenViewModel : Screen
     
     public void Exit()
     {
-        Console.WriteLine("Exiting...");
+        _softwareStateManager.Shutdown();
     }
     
     public void Credits()

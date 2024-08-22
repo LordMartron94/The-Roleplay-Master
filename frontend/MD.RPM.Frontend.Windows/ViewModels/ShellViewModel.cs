@@ -1,4 +1,5 @@
 ﻿using Caliburn.Micro;
+using MD.Common.SoftwareStateHandling;
 
 namespace MD.RPM.Frontend.Windows.ViewModels;
 
@@ -12,5 +13,12 @@ public class ShellViewModel : Conductor<object>
         
         // ReSharper disable once VirtualMemberCallInConstructor
         ActivateItemAsync(homeScreenViewModel);
+        
+        SoftwareStateManager softwareStateManager = SoftwareStateManager.Instance;
+        
+        softwareStateManager.SetExitHandler(() =>
+        {
+            TryCloseAsync();
+        });
     }
 }
