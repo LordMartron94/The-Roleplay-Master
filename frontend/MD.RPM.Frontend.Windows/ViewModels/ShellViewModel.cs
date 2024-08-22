@@ -4,13 +4,13 @@ namespace MD.RPM.Frontend.Windows.ViewModels;
 
 public class ShellViewModel : Conductor<object>
 {
-    private MainWindowViewModel _mainWindowViewModel;
+    private HomeScreenViewModel _homeScreenViewModel;
     
-    public ShellViewModel(MainWindowViewModel mainWindowViewModel)
+    public ShellViewModel(HomeScreenViewModel homeScreenViewModel)
     {
-        _mainWindowViewModel = mainWindowViewModel;
+        _homeScreenViewModel = homeScreenViewModel;
         
         // ReSharper disable once VirtualMemberCallInConstructor
-        ActivateItemAsync(mainWindowViewModel);
+        ActivateItemAsync(homeScreenViewModel);
     }
 }
