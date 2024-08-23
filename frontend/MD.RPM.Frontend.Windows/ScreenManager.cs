@@ -3,6 +3,12 @@ using MD.RPM.Frontend.Windows.ViewModels;
 
 namespace MD.RPM.Frontend.Windows;
 
+/// <summary>
+/// Provides screen switching functionality for use with Caliburn Micro.
+/// </summary>
+/// <remarks>Does no actual displaying on its own... This must be done through subscriptions. For example with a Conductor.
+/// <br/>This is for optimal versatility.
+/// </remarks>
 public sealed class ScreenManager : IScreenManager
 {
     private Dictionary<AppScreen, Screen?>? _screens;
@@ -53,6 +59,8 @@ public sealed class ScreenManager : IScreenManager
         if (!_initialized)
             throw new InvalidOperationException("ScreenManager has not been initialized. Initialize it before calling ChangeScreen.");
         
+        // Deactivate the current screen first, if any. May be redundant if used with a Conductor, but we keep it here for completeness.
+        // Just in case the developer doesn't use a Conductor.
         if (_currentScreen != null)
             await _currentScreen.DeactivateAsync(false);
 
@@ -63,5 +71,8 @@ public sealed class ScreenManager : IScreenManager
         
         foreach (Action<Screen> action in _screenChangeSubscriptions)
             action.Invoke(screenInstance!);
+
+        // Same as with Deactivation.
+        await _currentScreen.ActivateAsync();
     }
 }

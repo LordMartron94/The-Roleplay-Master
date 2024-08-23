@@ -19,6 +19,6 @@ public class ShellViewModel : Conductor<object>
 
     private void ChangeActiveItem(Screen screen)
     {
-        ActivateItemAsync(screen);
+        ActiveItem = screen;
     }
 }
