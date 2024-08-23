@@ -17,12 +17,12 @@ public class HomeScreenViewModel : Screen
 
     public void StartNewGame()
     {
-        Console.WriteLine("Starting new game...");
+        _screenManager.ChangeScreen(AppScreen.NewGameScreen);
     }
     
     public void LoadGame()
     {
-        Console.WriteLine("Loading game...");
+        _screenManager.ChangeScreen(AppScreen.LoadGameScreen);
     }
     
     public void Exit()
@@ -37,6 +37,6 @@ public class HomeScreenViewModel : Screen
     
     public void Options()
     {
-        Console.WriteLine("Options...");
+        _screenManager.ChangeScreen(AppScreen.OptionsScreen);
     }
 }

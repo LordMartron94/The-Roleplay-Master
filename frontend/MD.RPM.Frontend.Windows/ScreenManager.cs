@@ -34,7 +34,10 @@ public sealed class ScreenManager : IScreenManager
         _screens = new Dictionary<AppScreen, Screen?>
         {
             { AppScreen.HomeScreen, container.GetInstance<HomeScreenViewModel>() },
-            { AppScreen.CreditsScreen, container.GetInstance<CreditsScreenViewModel>() }
+            { AppScreen.CreditsScreen, container.GetInstance<CreditsScreenViewModel>() },
+            { AppScreen.LoadGameScreen, container.GetInstance<LoadGameViewModel>() },
+            { AppScreen.NewGameScreen, container.GetInstance<NewGameViewModel>() },
+            { AppScreen.OptionsScreen, container.GetInstance<OptionsViewModel>() }
         };
     }
 

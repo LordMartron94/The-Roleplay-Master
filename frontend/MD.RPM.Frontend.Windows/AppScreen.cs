@@ -3,5 +3,8 @@
 public enum AppScreen
 {
     HomeScreen,
-    CreditsScreen
+    CreditsScreen,
+    NewGameScreen,
+    LoadGameScreen,
+    OptionsScreen
 }
