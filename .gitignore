@@ -457,6 +457,6 @@ cython_debug/
 #.idea/
 
 # ==== Personal ====
-/PythonBackend/.vale.ini
-/PythonBackend/data
-/output
+.vale.ini
+data
+*.iml
