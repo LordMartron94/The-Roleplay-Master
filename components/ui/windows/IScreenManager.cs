@@ -1,6 +1,6 @@
 ﻿using Caliburn.Micro;
 
-namespace MD.RPM.Frontend.Windows;
+namespace MD.RPM.UI.Windows;
 
 public interface IScreenManager
 {

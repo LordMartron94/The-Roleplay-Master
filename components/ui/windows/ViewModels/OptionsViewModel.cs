@@ -1,12 +1,12 @@
 ﻿using Caliburn.Micro;
 
-namespace MD.RPM.Frontend.Windows.ViewModels;
+namespace MD.RPM.UI.Windows.ViewModels;
 
-public class NewGameViewModel : Screen
+public class OptionsViewModel : Screen
 {
     private readonly IScreenManager _screenManager;
 
-    public NewGameViewModel(IScreenManager screenManager)
+    public OptionsViewModel(IScreenManager screenManager)
     {
         _screenManager = screenManager;
     }

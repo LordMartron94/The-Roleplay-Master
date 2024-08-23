@@ -1,12 +1,12 @@
 ﻿using Caliburn.Micro;
 
-namespace MD.RPM.Frontend.Windows.ViewModels;
+namespace MD.RPM.UI.Windows.ViewModels;
 
-public class LoadGameViewModel : Screen
+public class NewGameViewModel : Screen
 {
     private readonly IScreenManager _screenManager;
 
-    public LoadGameViewModel(IScreenManager screenManager)
+    public NewGameViewModel(IScreenManager screenManager)
     {
         _screenManager = screenManager;
     }

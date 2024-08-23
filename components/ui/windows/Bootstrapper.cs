@@ -1,9 +1,9 @@
 ﻿using System.Windows;
 using Caliburn.Micro;
 using MD.Common.SoftwareStateHandling;
-using MD.RPM.Frontend.Windows.ViewModels;
+using MD.RPM.UI.Windows.ViewModels;
 
-namespace MD.RPM.Frontend.Windows;
+namespace MD.RPM.UI.Windows;
 
 public class Bootstrapper : BootstrapperBase
 {

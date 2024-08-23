@@ -1,7 +1,7 @@
 ﻿using Caliburn.Micro;
 using MD.Common.SoftwareStateHandling;
 
-namespace MD.RPM.Frontend.Windows.ViewModels;
+namespace MD.RPM.UI.Windows.ViewModels;
 
 public class ShellViewModel : Conductor<object>
 {

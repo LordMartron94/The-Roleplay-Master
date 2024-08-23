@@ -1,6 +1,6 @@
 ﻿using Caliburn.Micro;
 
-namespace MD.RPM.Frontend.Windows.ViewModels;
+namespace MD.RPM.UI.Windows.ViewModels;
 
 public class CreditsScreenViewModel : Screen
 {

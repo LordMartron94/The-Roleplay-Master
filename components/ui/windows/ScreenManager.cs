@@ -1,7 +1,7 @@
 ﻿using Caliburn.Micro;
-using MD.RPM.Frontend.Windows.ViewModels;
+using MD.RPM.UI.Windows.ViewModels;
 
-namespace MD.RPM.Frontend.Windows;
+namespace MD.RPM.UI.Windows;
 
 /// <summary>
 /// Provides screen switching functionality for use with Caliburn Micro.

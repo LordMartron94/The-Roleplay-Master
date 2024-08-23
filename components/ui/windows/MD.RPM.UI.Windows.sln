@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MD.RPM.UI.Windows", "MD.RPM.UI.Windows.csproj", "{740A6C03-A24C-47BC-8E20-F384E48B28F4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MD.Common", "..\..\..\shared\MD.Common\MD.Common.csproj", "{878168D5-5EB4-4B1B-A6BB-E309828A759F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{740A6C03-A24C-47BC-8E20-F384E48B28F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{740A6C03-A24C-47BC-8E20-F384E48B28F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{740A6C03-A24C-47BC-8E20-F384E48B28F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{740A6C03-A24C-47BC-8E20-F384E48B28F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{878168D5-5EB4-4B1B-A6BB-E309828A759F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{878168D5-5EB4-4B1B-A6BB-E309828A759F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{878168D5-5EB4-4B1B-A6BB-E309828A759F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{878168D5-5EB4-4B1B-A6BB-E309828A759F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

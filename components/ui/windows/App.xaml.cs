@@ -1,8 +1,6 @@
-﻿using System.Configuration;
-using System.Data;
-using System.Windows;
+﻿using System.Windows;
 
-namespace MD.RPM.Frontend.Windows;
+namespace MD.RPM.UI.Windows;
 
 /// <summary>
 /// Interaction logic for App.xaml

@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace MD.RPM.Frontend.Windows.Views;
+namespace MD.RPM.UI.Windows.Views;
 
 public partial class CreditsScreenView : UserControl
 {
