@@ -1,0 +1,15 @@
+﻿<Application x:Class="MD.RPM.Frontend.Windows.APP"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:windowsInterface="clr-namespace:MD.RPM.Frontend.Windows"
+             xmlns:viewModels="clr-namespace:MD.RPM.Frontend.Windows.ViewModels">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary>
+                    <windowsInterface:Bootstrapper x:Key="Bootstrapper" />
+                </ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
