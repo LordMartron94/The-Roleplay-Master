@@ -11,12 +11,14 @@ type Detector struct {
 	ShutdownCh        chan struct{}
 	NetworkListener   *NetworkListener
 	ConnectionManager *ConnectionManager
+	ShutdownSigCh     chan struct{}
 }
 
-func (d *Detector) StartDetectionLoop(wg *sync.WaitGroup) {
+func (d *Detector) StartDetectionLoop(wg *sync.WaitGroup, shutdownSigCh chan struct{}) {
 	port := ":8080"
 
 	d.DataChannel = make(chan []byte)
+	d.ShutdownSigCh = shutdownSigCh
 
 	d.NetworkListener = &NetworkListener{
 		Logger:     d.Logger,
@@ -34,5 +36,6 @@ func (d *Detector) StartDetectionLoop(wg *sync.WaitGroup) {
 	}
 
 	d.ConnectionManager.Listener = d.NetworkListener.Listener
+	d.ConnectionManager.ShutdownSigCh = d.ShutdownSigCh
 	d.ConnectionManager.StartHandlingConnections()
 }

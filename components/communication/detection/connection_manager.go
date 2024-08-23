@@ -9,9 +9,10 @@ import (
 
 // ConnectionManager accepts and processes new client connections.
 type ConnectionManager struct {
-	Listener    net.Listener
-	Logger      logging.HoornLogger
-	DataChannel chan []byte
+	Listener      net.Listener
+	Logger        logging.HoornLogger
+	DataChannel   chan []byte
+	ShutdownSigCh chan struct{}
 }
 
 func (cm *ConnectionManager) StartHandlingConnections() {
@@ -37,6 +38,13 @@ func (cm *ConnectionManager) handleIncomingConnections() {
 func (cm *ConnectionManager) processDataChannel() {
 	for data := range cm.DataChannel {
 		cm.Logger.Info(fmt.Sprintf("Received JSON: %s", string(data)), false)
+
+		if string(data) == `{"action": "shutdown"}` {
+			cm.Logger.Info("Received shutdown request.", false)
+
+			// Notify the main process that a shutdown is requested
+			close(cm.ShutdownSigCh)
+		}
 	}
 }
 

@@ -33,21 +33,26 @@ func main() {
 	hoornLogger.Info("Starting communication layer...", false)
 
 	shutdownCh := make(chan struct{})
+	shutdownSigCh := make(chan struct{}) // Add this line
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 
 	var detector = detection.Detector{Logger: hoornLogger, ShutdownCh: shutdownCh}
 
-	go detector.StartDetectionLoop(&wg)
+	go detector.StartDetectionLoop(&wg, shutdownSigCh) // Add shutdownSigCh here
 
-	c := make(chan os.Signal, 1)
+	c := make(chan os.Signal, 2)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
-	<-c
+	// Monitor OS signals and shutdown signal from ConnectionManager
+	select {
+	case <-c:
+		hoornLogger.Info("OS signal catched, Terminating communication layer...", false)
+	case <-shutdownSigCh:
+		hoornLogger.Info("Shutdown signal received. Terminating communication layer...", false)
+	}
 
-	hoornLogger.Info("Terminating communication layer...", false)
 	close(shutdownCh)
-
 	wg.Wait()
 }
