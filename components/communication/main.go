@@ -1,10 +1,14 @@
 package main
 
 import (
+	"./detection"
 	"./logging"
 	"log"
 	"os"
+	"os/signal"
 	"path/filepath"
+	"sync"
+	"syscall"
 )
 
 func getLogger() logging.HoornLogger {
@@ -25,11 +29,25 @@ func getLogger() logging.HoornLogger {
 }
 
 func main() {
-	var hoornLogger logging.HoornLogger = getLogger()
-	hoornLogger.Debug("This is a debug message", false)
-	hoornLogger.Info("This is an info message", false)
-	hoornLogger.Warn("This is a warning message", false)
-	hoornLogger.Error("This is an error message", false)
-	hoornLogger.Critical("This is a very important critical message", false)
-	hoornLogger.Debug("This debug message will always be logged", true)
+	var hoornLogger = getLogger()
+	hoornLogger.Info("Starting communication layer...", false)
+
+	shutdownCh := make(chan struct{})
+
+	var wg sync.WaitGroup
+	wg.Add(1)
+
+	var detector = detection.Detector{Logger: hoornLogger, ShutdownCh: shutdownCh}
+
+	go detector.StartDetectionLoop(&wg)
+
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+
+	<-c
+
+	hoornLogger.Info("Terminating communication layer...", false)
+	close(shutdownCh)
+
+	wg.Wait()
 }
