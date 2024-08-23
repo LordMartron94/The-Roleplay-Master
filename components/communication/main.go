@@ -1,9 +1,31 @@
 package main
 
-import "./logging"
+import (
+	"./logging"
+	"log"
+	"os"
+	"path/filepath"
+)
+
+func getLogger() logging.HoornLogger {
+	var userConfigDir, err = os.UserHomeDir()
+	if err != nil {
+		log.Fatalf("Failed to get user config directory: %v", err)
+	}
+
+	var dir = filepath.Join(userConfigDir, "AppData", "Local")
+	var logDir = dir + "\\The Roleplay Master\\logs\\communication_layer\\"
+
+	return logging.NewHoornLogger(
+		logging.INFO,
+		logging.DefaultHoornLogOutput{},
+		logging.NewFileHoornLogOutput(
+			logDir,
+			5))
+}
 
 func main() {
-	var hoornLogger logging.HoornLogger = logging.NewHoornLogger(logging.INFO)
+	var hoornLogger logging.HoornLogger = getLogger()
 	hoornLogger.Debug("This is a debug message", false)
 	hoornLogger.Info("This is an info message", false)
 	hoornLogger.Warn("This is a warning message", false)
