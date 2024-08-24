@@ -12,12 +12,19 @@ public class MiddlemanLauncher
     private readonly Process _process;
     private readonly API _api;
 
-    public MiddlemanLauncher(API api)
+    public MiddlemanLauncher(API api, bool visibleLauncherWindow = false)
     {
         _api = api;
         _process = new Process();
         _process.StartInfo.FileName = @"D:\10 Work\Programming\00 Current Projects\The Roleplay Master\components\communication\middleman.exe";
         _process.StartInfo.WorkingDirectory = @"D:\10 Work\Programming\00 Current Projects\The Roleplay Master\components\communication"; 
+        
+        // ReSharper disable once InvertIf
+        if (!visibleLauncherWindow)
+        {
+            _process.StartInfo.UseShellExecute = false;
+            _process.StartInfo.CreateNoWindow = true;
+        } 
     }
 
     public void Launch()
