@@ -13,7 +13,7 @@ type ConnectionManager struct {
 	Listener      net.Listener
 	Logger        logging.HoornLogger
 	Interpreter   *interpretation.Interpreter
-	DataChannel   chan []byte
+	DataChannel   chan ConnData
 	ShutdownSigCh chan struct{}
 }
 
@@ -38,8 +38,8 @@ func (cm *ConnectionManager) handleIncomingConnections() {
 }
 
 func (cm *ConnectionManager) processDataChannel() {
-	for data := range cm.DataChannel {
-		rawJson := string(data)
+	for connData := range cm.DataChannel {
+		rawJson := string(connData.Data)
 
 		cm.Logger.Info(fmt.Sprintf("Received JSON: %s", rawJson), false)
 
@@ -54,9 +54,11 @@ func (cm *ConnectionManager) processDataChannel() {
 
 		if interpreted.Actions[0].Name == "Shutdown" {
 			cm.Logger.Info("Received shutdown request.", false)
-
 			close(cm.ShutdownSigCh)
 		}
+
+		resp := "This is the response after interpretation."
+		cm.SendResponse(connData.Conn, resp)
 	}
 }
 
@@ -75,9 +77,7 @@ func (cm *ConnectionManager) handleConnection(conn net.Conn) {
 			break
 		}
 
-		cm.SendResponse(conn, "This is a response message from the server.")
-
-		cm.DataChannel <- buf[:n]
+		cm.DataChannel <- ConnData{Conn: conn, Data: buf[:n]}
 	}
 }
 

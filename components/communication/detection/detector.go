@@ -8,7 +8,7 @@ import (
 
 type Detector struct {
 	Logger            logging.HoornLogger
-	DataChannel       chan []byte
+	DataChannel       chan ConnData
 	ShutdownCh        chan struct{}
 	NetworkListener   *NetworkListener
 	ConnectionManager *ConnectionManager
@@ -18,7 +18,7 @@ type Detector struct {
 func (d *Detector) StartDetectionLoop(wg *sync.WaitGroup, shutdownSigCh chan struct{}) {
 	port := ":8080"
 
-	d.DataChannel = make(chan []byte)
+	d.DataChannel = make(chan ConnData)
 	d.ShutdownSigCh = shutdownSigCh
 
 	d.NetworkListener = &NetworkListener{
