@@ -42,7 +42,6 @@ func (cm *ConnectionManager) processDataChannel() {
 		if string(data) == `{"action": "shutdown"}` {
 			cm.Logger.Info("Received shutdown request.", false)
 
-			// Notify the main process that a shutdown is requested
 			close(cm.ShutdownSigCh)
 		}
 	}
