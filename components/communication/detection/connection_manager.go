@@ -61,6 +61,17 @@ func (cm *ConnectionManager) handleConnection(conn net.Conn) {
 			}
 			break
 		}
+
+		cm.SendResponse(conn, "This is a response message from the server.")
+
 		cm.DataChannel <- buf[:n]
+	}
+}
+
+func (cm *ConnectionManager) SendResponse(conn net.Conn, message string) {
+	response := []byte(message + "\n")
+	_, err := conn.Write(response)
+	if err != nil {
+		cm.Logger.Error(fmt.Sprintf("Error writing: %v", err), false)
 	}
 }

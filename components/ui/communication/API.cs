@@ -14,18 +14,31 @@ public class API
         _connector = new Connector("127.0.0.1", 8080);
     }
 
+    private void SendMessage(string jsonData)
+    {
+        if (_connector == null)
+            throw new InvalidOperationException("API not initialized. Call Initialize() before using.");
+        
+        string? response = Task.Run(async () => await _connector.SendData(jsonData)).GetAwaiter().GetResult();
+        
+        Console.WriteLine($"Received response: {response}");
+    }
+
     public void ShutdownMiddleman()
     {
-        _connector?.SendData("{\"action\": \"shutdown\"}");
+        const string jsonData = "{\"action\": \"shutdown\"}";
+        SendMessage(jsonData);
     }
 
     public void TestMessage(string message)
     {
-        _connector?.SendData($"{{ \"type\": \"test\", \"message\": \"{message}\" }}");
+        const string jsonData = "{{ \"type\": \"test\", \"message\": \"{message}\" }}";
+        SendMessage(jsonData);
     }
 
     public void CreateNewGame()
     {
-        _connector?.SendData("{ \"actions\": \"create_game\" }");
+        const string jsonData = "{ \"actions\": \"create_game\" }";
+        SendMessage(jsonData);
     }
 }
