@@ -1,6 +1,7 @@
 package detection
 
 import (
+	"../interpretation"
 	"../logging"
 	"fmt"
 	"io"
@@ -11,6 +12,7 @@ import (
 type ConnectionManager struct {
 	Listener      net.Listener
 	Logger        logging.HoornLogger
+	Interpreter   *interpretation.Interpreter
 	DataChannel   chan []byte
 	ShutdownSigCh chan struct{}
 }
@@ -37,9 +39,20 @@ func (cm *ConnectionManager) handleIncomingConnections() {
 
 func (cm *ConnectionManager) processDataChannel() {
 	for data := range cm.DataChannel {
-		cm.Logger.Info(fmt.Sprintf("Received JSON: %s", string(data)), false)
+		rawJson := string(data)
 
-		if string(data) == `{"action": "shutdown"}` {
+		cm.Logger.Info(fmt.Sprintf("Received JSON: %s", rawJson), false)
+
+		interpreted, err := cm.Interpreter.Interpret(rawJson)
+		if err != nil {
+			continue
+		}
+
+		message := fmt.Sprintf("Request source %s with action %s", interpreted.Source, interpreted.Actions[0].Name)
+
+		cm.Logger.Info(message, false)
+
+		if interpreted.Actions[0].Name == "Shutdown" {
 			cm.Logger.Info("Received shutdown request.", false)
 
 			close(cm.ShutdownSigCh)

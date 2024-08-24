@@ -1,8 +1,8 @@
 package interpretation
 
 type Action struct {
-	name string
-	data string
+	Name string `json:"name"`
+	Data string `json:"data"`
 }
 
 func NewAction(name, data string) *Action {

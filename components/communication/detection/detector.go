@@ -1,6 +1,7 @@
 package detection
 
 import (
+	"../interpretation"
 	"../logging"
 	"sync"
 )
@@ -28,6 +29,7 @@ func (d *Detector) StartDetectionLoop(wg *sync.WaitGroup, shutdownSigCh chan str
 	d.ConnectionManager = &ConnectionManager{
 		DataChannel: d.DataChannel,
 		Logger:      d.Logger,
+		Interpreter: interpretation.NewInterpreter(d.Logger),
 	}
 
 	if err := d.NetworkListener.StartListening(wg, port); err != nil {
