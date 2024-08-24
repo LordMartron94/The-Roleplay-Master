@@ -1,20 +1,44 @@
 package detection
 
 import (
+	"../handling"
 	"../interpretation"
 	"../logging"
 	"fmt"
 	"io"
 	"net"
+	"sync"
 )
 
 // ConnectionManager accepts and processes new client connections.
 type ConnectionManager struct {
 	Listener      net.Listener
 	Logger        logging.HoornLogger
-	Interpreter   *interpretation.Interpreter
-	DataChannel   chan ConnData
 	ShutdownSigCh chan struct{}
+	interpreter   *interpretation.Interpreter
+	dataChannel   chan ConnData
+	actionHandler *handling.ActionHandler
+}
+
+func NewConnectionManager(logger logging.HoornLogger, shutdownSigCh chan struct{}, port string, wg *sync.WaitGroup) (*ConnectionManager, error) {
+	networkListener := &NetworkListener{
+		Logger:     logger,
+		ShutdownCh: shutdownSigCh,
+	}
+
+	if err := networkListener.StartListening(wg, port); err != nil {
+		logger.Error(err.Error(), false)
+		return nil, err
+	}
+
+	return &ConnectionManager{
+		Listener:      networkListener.Listener,
+		Logger:        logger,
+		ShutdownSigCh: shutdownSigCh,
+		interpreter:   interpretation.NewInterpreter(logger),
+		dataChannel:   make(chan ConnData),
+		actionHandler: handling.NewActionHandler(logger, shutdownSigCh),
+	}, nil
 }
 
 func (cm *ConnectionManager) StartHandlingConnections() {
@@ -38,28 +62,25 @@ func (cm *ConnectionManager) handleIncomingConnections() {
 }
 
 func (cm *ConnectionManager) processDataChannel() {
-	for connData := range cm.DataChannel {
+	for connData := range cm.dataChannel {
 		rawJson := string(connData.Data)
 
 		cm.Logger.Info(fmt.Sprintf("Received JSON: %s", rawJson), false)
 
-		interpreted, err := cm.Interpreter.Interpret(rawJson)
+		request, err := cm.interpreter.Interpret(rawJson)
 		if err != nil {
 			resp := interpretation.InvalidRequestFormat()
 			cm.SendResponse(connData.Conn, resp.ToJson())
 			continue
 		}
 
-		message := fmt.Sprintf("Request source %s with action %s", interpreted.Source, interpreted.Actions[0].Name)
+		message := fmt.Sprintf("Request source %s with action %s", request.Source, request.Actions[0].Name)
 		cm.Logger.Debug(message, false)
 
-		if interpreted.Actions[0].Name == "Shutdown" {
-			cm.Logger.Debug("Received shutdown request.", false)
-			close(cm.ShutdownSigCh)
+		responses := cm.actionHandler.HandleRequest(&request)
+		for _, resp := range responses {
+			cm.SendResponse(connData.Conn, resp.ToJson())
 		}
-
-		resp := interpretation.SuccessResponse()
-		cm.SendResponse(connData.Conn, resp.ToJson())
 	}
 }
 
@@ -78,7 +99,7 @@ func (cm *ConnectionManager) handleConnection(conn net.Conn) {
 			break
 		}
 
-		cm.DataChannel <- ConnData{Conn: conn, Data: buf[:n]}
+		cm.dataChannel <- ConnData{Conn: conn, Data: buf[:n]}
 	}
 }
 

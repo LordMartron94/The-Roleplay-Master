@@ -32,13 +32,12 @@ func main() {
 	var hoornLogger = getLogger()
 	hoornLogger.Info("Starting communication layer...", false)
 
-	shutdownCh := make(chan struct{})
 	shutdownSigCh := make(chan struct{})
 
 	var wg sync.WaitGroup
 	wg.Add(1)
 
-	var detector = detection.Detector{Logger: hoornLogger, ShutdownCh: shutdownCh}
+	var detector = detection.Detector{Logger: hoornLogger}
 
 	go detector.StartDetectionLoop(&wg, shutdownSigCh)
 
@@ -52,6 +51,6 @@ func main() {
 		hoornLogger.Info("Shutdown signal received. Terminating communication layer...", false)
 	}
 
-	close(shutdownCh)
+	close(shutdownSigCh)
 	wg.Wait()
 }

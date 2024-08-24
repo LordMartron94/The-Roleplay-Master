@@ -21,6 +21,13 @@ func InvalidRequestFormat() *Response {
 	}
 }
 
+func InvalidAction() *Response {
+	return &Response{
+		message: "Invalid action. Please check the documentation and provide a valid action name.",
+		code:    399,
+	}
+}
+
 func ErrorResponseDefault() *Response {
 	return &Response{
 		message: "An unknown error has occurred, please report this to the developer immediately along with the logs.\nYou can find the log location in the software documentation.",
