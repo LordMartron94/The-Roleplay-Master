@@ -45,20 +45,21 @@ func (cm *ConnectionManager) processDataChannel() {
 
 		interpreted, err := cm.Interpreter.Interpret(rawJson)
 		if err != nil {
+			resp := interpretation.InvalidRequestFormat()
+			cm.SendResponse(connData.Conn, resp.ToJson())
 			continue
 		}
 
 		message := fmt.Sprintf("Request source %s with action %s", interpreted.Source, interpreted.Actions[0].Name)
-
-		cm.Logger.Info(message, false)
+		cm.Logger.Debug(message, false)
 
 		if interpreted.Actions[0].Name == "Shutdown" {
-			cm.Logger.Info("Received shutdown request.", false)
+			cm.Logger.Debug("Received shutdown request.", false)
 			close(cm.ShutdownSigCh)
 		}
 
-		resp := "This is the response after interpretation."
-		cm.SendResponse(connData.Conn, resp)
+		resp := interpretation.SuccessResponse()
+		cm.SendResponse(connData.Conn, resp.ToJson())
 	}
 }
 

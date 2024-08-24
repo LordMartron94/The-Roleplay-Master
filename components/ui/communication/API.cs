@@ -19,6 +19,11 @@ public class API
         return $"{{\"source\":\"Windows UI Component\", \"actions\":[{{\"name\":\"{actionName}\", \"data\":\"{data}\"}}]}}";    
     }
     
+    private string FormatMessageWrongTest(string actionName, string data = "")
+    {
+        return $"{{\"soce\":\"Windows UI Component\", \"actions\":[{{\"ne\":\"{actionName}\", \"da\":\"{data}\"}}]}}";    
+    }
+    
 
     private void SendMessage(string jsonData)
     {
@@ -38,7 +43,7 @@ public class API
 
     public void TestMessage(string message)
     {
-        string jsonData = FormatMessage("Test", message);
+        string jsonData = FormatMessageWrongTest("Test", message);
         SendMessage(jsonData);
     }
 

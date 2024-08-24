@@ -1,5 +1,7 @@
 package interpretation
 
+import "strconv"
+
 type Response struct {
 	message string
 	code    int
@@ -31,4 +33,8 @@ func ErrorResponse(message string, code int) *Response {
 		message: message,
 		code:    code,
 	}
+}
+
+func (r *Response) ToJson() string {
+	return `{"message": "` + r.message + `", "code": ` + strconv.Itoa(r.code) + `}`
 }
