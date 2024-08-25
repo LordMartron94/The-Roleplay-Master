@@ -38,7 +38,7 @@ func (h *ActionHandler) HandleRequest(request *interpretation.Request) []*interp
 				responses = append(responses, resp)
 			} else {
 				h.Logger.Debug(fmt.Sprintf("Received unsupported action %s for source %s", action.Name, request.Source), false)
-				resp := interpretation.InvalidAction()
+				resp := interpretation.InvalidAction(action.Name)
 				responses = append(responses, resp)
 			}
 		}
