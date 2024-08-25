@@ -21,11 +21,6 @@ public class API
         return $"{{\"source\":\"Windows UI Component\", \"actions\":[{{\"name\":\"{actionName}\", \"data\":\"{data}\"}}]}}";    
     }
     
-    private string FormatMessageWrongTest(string actionName, string data = "")
-    {
-        return $"{{\"soce\":\"Windows UI Component\", \"actions\":[{{\"ne\":\"{actionName}\", \"da\":\"{data}\"}}]}}";    
-    }
-    
 
     private ServerResponse SendMessage(string jsonData)
     {
@@ -39,12 +34,6 @@ public class API
     public ServerResponse ShutdownMiddleman()
     {
         string jsonData = FormatMessage("Shutdown");
-        return SendMessage(jsonData);
-    }
-
-    public ServerResponse TestMessage(string message)
-    {
-        string jsonData = FormatMessageWrongTest("Test", message);
         return SendMessage(jsonData);
     }
 

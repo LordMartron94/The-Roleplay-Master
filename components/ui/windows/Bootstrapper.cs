@@ -2,7 +2,6 @@
 using Caliburn.Micro;
 using MD.Common.SoftwareStateHandling;
 using MD.RPM.UI.Communication;
-using MD.RPM.UI.Communication.Model;
 using MD.RPM.UI.Windows.Launch;
 using MD.RPM.UI.Windows.ViewModels;
 
@@ -51,13 +50,6 @@ public class Bootstrapper : BootstrapperBase
         DisplayRootViewForAsync<ShellViewModel>();
         IScreenManager? screenManager = _container.GetInstance<IScreenManager>();
         screenManager.ChangeScreen(AppScreen.HomeScreen);
-        
-        // Tests
-        ServerResponse response = _api.TestMessage("This is a test message sent from the Bootstrapper.");
-        ServerResponse response2 = _api.CreateNewGame();
-        
-        Console.WriteLine($"Test message response status code: {response.code}");
-        Console.WriteLine($"Create new game response status code: {response2.code}");
     }
     
     protected override void OnExit(object sender, EventArgs e)
