@@ -1,4 +1,6 @@
 ﻿using MD.RPM.UI.Communication._Internal;
+using MD.RPM.UI.Communication.Model;
+using Newtonsoft.Json;
 
 namespace MD.RPM.UI.Communication;
 
@@ -25,31 +27,30 @@ public class API
     }
     
 
-    private void SendMessage(string jsonData)
+    private ServerResponse SendMessage(string jsonData)
     {
         if (_connector == null)
             throw new InvalidOperationException("API not initialized. Call Initialize() before using.");
         
-        string? response = Task.Run(async () => await _connector.SendData(jsonData)).GetAwaiter().GetResult();
-        
-        Console.WriteLine($"Received response: {response}");
+        string response = Task.Run(async () => await _connector.SendData(jsonData)).GetAwaiter().GetResult()!;
+        return JsonConvert.DeserializeObject<ServerResponse>(response);
     }
 
-    public void ShutdownMiddleman()
+    public ServerResponse ShutdownMiddleman()
     {
         string jsonData = FormatMessage("Shutdown");
-        SendMessage(jsonData);
+        return SendMessage(jsonData);
     }
 
-    public void TestMessage(string message)
+    public ServerResponse TestMessage(string message)
     {
         string jsonData = FormatMessageWrongTest("Test", message);
-        SendMessage(jsonData);
+        return SendMessage(jsonData);
     }
 
-    public void CreateNewGame()
+    public ServerResponse CreateNewGame()
     {
         string jsonData = FormatMessage("CreateNewGame");
-        SendMessage(jsonData);
+        return SendMessage(jsonData);
     }
 }
