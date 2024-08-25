@@ -21,9 +21,9 @@ func InvalidRequestFormat() *Response {
 	}
 }
 
-func InvalidAction() *Response {
+func InvalidAction(action string) *Response {
 	return &Response{
-		message: "Invalid action. Please check the documentation and provide a valid action name.",
+		message: "Invalid action. Please check the documentation and provide a valid action name.\nUnknown Action: " + action,
 		code:    399,
 	}
 }
