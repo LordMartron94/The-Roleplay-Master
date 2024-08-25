@@ -1,8 +1,18 @@
 package interpretation
 
+import "errors"
+
 type Action struct {
-	name string
-	data string
+	Name string `json:"name"`
+	Data string `json:"data"`
+}
+
+func (a *Action) validateAction() error {
+	if a.Name == "" {
+		return errors.New("action name cannot be empty")
+	}
+
+	return nil
 }
 
 func NewAction(name, data string) *Action {

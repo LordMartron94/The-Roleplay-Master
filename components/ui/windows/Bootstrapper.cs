@@ -18,7 +18,7 @@ public class Bootstrapper : BootstrapperBase
         _container = new SimpleContainer();
         StateDebugger _ = new StateDebugger();
         _api = new API();
-        _middlemanLauncher = new MiddlemanLauncher(_api);
+        _middlemanLauncher = new MiddlemanLauncher(_api, true);
         
         Initialize();
     }
@@ -50,10 +50,6 @@ public class Bootstrapper : BootstrapperBase
         DisplayRootViewForAsync<ShellViewModel>();
         IScreenManager? screenManager = _container.GetInstance<IScreenManager>();
         screenManager.ChangeScreen(AppScreen.HomeScreen);
-        
-        // Tests
-        _api.TestMessage("This is a test message sent from the Bootstrapper.");
-        _api.CreateNewGame();
     }
     
     protected override void OnExit(object sender, EventArgs e)

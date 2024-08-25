@@ -1,4 +1,6 @@
 ﻿using MD.RPM.UI.Communication._Internal;
+using MD.RPM.UI.Communication.Model;
+using Newtonsoft.Json;
 
 namespace MD.RPM.UI.Communication;
 
@@ -14,18 +16,30 @@ public class API
         _connector = new Connector("127.0.0.1", 8080);
     }
 
-    public void ShutdownMiddleman()
+    private string FormatMessage(string actionName, string data = "")
     {
-        _connector?.SendData("{\"action\": \"shutdown\"}");
+        return $"{{\"source\":\"Windows UI Component\", \"actions\":[{{\"name\":\"{actionName}\", \"data\":\"{data}\"}}]}}";    
+    }
+    
+
+    private ServerResponse SendMessage(string jsonData)
+    {
+        if (_connector == null)
+            throw new InvalidOperationException("API not initialized. Call Initialize() before using.");
+        
+        string response = Task.Run(async () => await _connector.SendData(jsonData)).GetAwaiter().GetResult()!;
+        return JsonConvert.DeserializeObject<ServerResponse>(response);
     }
 
-    public void TestMessage(string message)
+    public ServerResponse ShutdownMiddleman()
     {
-        _connector?.SendData($"{{ \"type\": \"test\", \"message\": \"{message}\" }}");
+        string jsonData = FormatMessage("Shutdown");
+        return SendMessage(jsonData);
     }
 
-    public void CreateNewGame()
+    public ServerResponse CreateNewGame()
     {
-        _connector?.SendData("{ \"actions\": \"create_game\" }");
+        string jsonData = FormatMessage("CreateNewGame");
+        return SendMessage(jsonData);
     }
 }

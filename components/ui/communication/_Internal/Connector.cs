@@ -9,37 +9,61 @@ namespace MD.RPM.UI.Communication._Internal;
 public class Connector
 {
     private readonly TcpClient _client;
+    private readonly ConnectionExceptionHandler _exceptionHandler;
 
     public Connector(string ipAddress, int port)
     {
         _client = new TcpClient(ipAddress, port);
+        _exceptionHandler = new ConnectionExceptionHandler();
+    }
+
+    private async Task<string?> ReceiveData()
+    {
+        try
+        {
+            NetworkStream stream = _client.GetStream();
+            byte[] data = new byte[1024];
+            int bytesRead = await stream.ReadAsync(data);
+
+            if (bytesRead == 0)
+            {
+                Console.WriteLine("The server has closed the connection.");
+                return null;
+            }
+
+            string response = Encoding.UTF8.GetString(data, 0, bytesRead);
+            return response;
+        }
+        catch (Exception ex)
+        {
+            _exceptionHandler.HandleException(ex);
+        }
+        
+        return null;
     }
 
     /// <summary>
     /// Send data to the connected TCP server.
     /// </summary>
     /// <param name="jsonData">The Json Data to send.</param>
-    public void SendData(string jsonData)
+    public async Task<string?> SendData(string jsonData)
     {
         try
         {
             NetworkStream stream = _client.GetStream();
-            
+
             byte[] data = Encoding.UTF8.GetBytes(jsonData);
-            stream.Write(data, 0, data.Length);
+            await stream.WriteAsync(data);
             Console.WriteLine("Sent data to the server.");
-        }
-        catch (SocketException ex)
-        {
-            Console.WriteLine($"Socket error while sanding data: {ex.Message}");
-        }
-        catch (IOException ex)
-        {
-            Console.WriteLine($"IO error while sending data: {ex.Message}");
+
+            string? response = await ReceiveData();
+            return response;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"An error occurred while sending data: {ex.Message}");
+            _exceptionHandler.HandleException(ex);
         }
+
+        return null;
     }
 }
