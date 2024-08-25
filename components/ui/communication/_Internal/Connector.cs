@@ -6,7 +6,7 @@ namespace MD.RPM.UI.Communication._Internal;
 /// <summary>
 /// Class for connecting to a TCP server and sending data.
 /// </summary>
-public class Connector
+internal class Connector
 {
     private readonly TcpClient _client;
     private readonly ConnectionExceptionHandler _exceptionHandler;

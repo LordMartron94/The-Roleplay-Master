@@ -17,7 +17,7 @@ public class Bootstrapper : BootstrapperBase
     {
         _container = new SimpleContainer();
         StateDebugger _ = new StateDebugger();
-        _api = new API();
+        _api = API.Instance;
         _middlemanLauncher = new MiddlemanLauncher(_api, true);
         
         Initialize();

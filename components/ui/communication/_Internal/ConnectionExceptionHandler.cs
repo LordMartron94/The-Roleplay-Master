@@ -7,7 +7,7 @@ namespace MD.RPM.UI.Communication._Internal;
 /// <summary>
 /// Handles any exceptions that occur during communication with the server.
 /// </summary>
-public class ConnectionExceptionHandler
+internal class ConnectionExceptionHandler
 {
     public ConnectionExceptionHandler()
     {

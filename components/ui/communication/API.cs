@@ -7,39 +7,69 @@ namespace MD.RPM.UI.Communication;
 /// <summary>
 /// API interface for communication with the server.
 /// </summary>
-public class API
+public sealed class API
 {
+    private static volatile API? _instance;
+    private readonly static object SyncRoot = new object();
+    
     private Connector? _connector;
+    private readonly RequestFactory _requestFactory; 
+    private readonly ResponseHandler _responseHandler;
+
+    private API()
+    {
+        _requestFactory = new RequestFactory();
+        _responseHandler = new ResponseHandler();
+    }
+
+    public static API Instance
+    {
+        get
+        {
+            if (_instance != null)
+                return _instance;
+
+            lock (SyncRoot)
+            {
+                // ReSharper disable once ConvertIfStatementToNullCoalescingAssignment
+                if (_instance == null)
+                    _instance = new API();
+            }
+
+            return _instance;
+        }
+    }
+    
 
     public void Initialize()
     {
         _connector = new Connector("127.0.0.1", 8080);
     }
-
-    private string FormatMessage(string actionName, string data = "")
-    {
-        return $"{{\"source\":\"Windows UI Component\", \"actions\":[{{\"name\":\"{actionName}\", \"data\":\"{data}\"}}]}}";    
-    }
     
 
-    private ServerResponse SendMessage(string jsonData)
+    private ServerResponse SendMessage(Request request)
     {
         if (_connector == null)
             throw new InvalidOperationException("API not initialized. Call Initialize() before using.");
+
+        string jsonData = request.ToJson();
         
         string response = Task.Run(async () => await _connector.SendData(jsonData)).GetAwaiter().GetResult()!;
-        return JsonConvert.DeserializeObject<ServerResponse>(response);
+        ServerResponse serverResponse = JsonConvert.DeserializeObject<ServerResponse>(response);
+        
+        _responseHandler.HandleResponse(serverResponse);
+        return serverResponse;
     }
 
     public ServerResponse ShutdownMiddleman()
     {
-        string jsonData = FormatMessage("Shutdown");
-        return SendMessage(jsonData);
+        Request request = _requestFactory.CreateRequest(new Dictionary<string, string> { { "Shutdown", "" } });
+        return SendMessage(request);
     }
 
     public ServerResponse CreateNewGame()
     {
-        string jsonData = FormatMessage("CreateNewGame");
-        return SendMessage(jsonData);
+        Request request = _requestFactory.CreateRequest(new Dictionary<string, string> { { "CreateNewGame", "" } });
+        return SendMessage(request);
     }
 }
