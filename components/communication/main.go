@@ -25,12 +25,14 @@ func getLogger() logging.HoornLogger {
 		logging.DefaultHoornLogOutput{},
 		logging.NewFileHoornLogOutput(
 			logDir,
-			5))
+			5,
+			true,
+		))
 }
 
 func main() {
 	var hoornLogger = getLogger()
-	hoornLogger.Info("Starting communication layer...", false)
+	hoornLogger.Info("Starting communication layer...", false, "Middleman Component")
 
 	shutdownSigCh := make(chan struct{})
 
@@ -39,16 +41,17 @@ func main() {
 
 	var detector = detection.Detector{Logger: hoornLogger}
 
-	go detector.StartDetectionLoop(&wg, shutdownSigCh)
+	go detector.StartDetectionLoop(&wg, shutdownSigCh, ":8080", "Windows UI Component")
+	go detector.StartDetectionLoop(&wg, shutdownSigCh, ":8000", "Lifecycle Management Component")
 
 	c := make(chan os.Signal, 2)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
 	select {
 	case <-c:
-		hoornLogger.Info("OS signal catched, Terminating communication layer...", false)
+		hoornLogger.Info("OS signal catched, Terminating communication layer...", false, "Middleman Component")
 	case <-shutdownSigCh:
-		hoornLogger.Info("Shutdown signal received. Terminating communication layer...", false)
+		hoornLogger.Info("Shutdown signal received. Terminating communication layer...", false, "Middleman Component")
 	}
 
 	close(shutdownSigCh)
