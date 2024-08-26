@@ -20,3 +20,4 @@ The reason I took a component-based architecture with intermediary is so that:
 - Each component can be done with a language/framework that specializes in it.
 - Each component can develop independently of the rest of the system, in doing so making it re-usable in other projects too.
   - Additionally, this promotes a better separation of concerns (Single Responsibility Principle on module/component level) and higher maintainability & flexibility.
+- Life Cycle Management for components is handled by Rust for optimal speed and system resource management.
