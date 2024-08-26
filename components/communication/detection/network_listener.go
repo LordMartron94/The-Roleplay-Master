@@ -12,15 +12,16 @@ type NetworkListener struct {
 	Listener   net.Listener
 	Logger     logging.HoornLogger
 	ShutdownCh chan struct{}
+	ChannelId  string
 }
 
 func (nl *NetworkListener) StartListening(wg *sync.WaitGroup, port string) error {
 	listener, err := net.Listen("tcp", port)
 
 	if err == nil {
-		nl.Logger.Info(fmt.Sprintf("Listening on port %s...", port), false)
+		nl.Logger.Info(fmt.Sprintf("[%s] Listening on port %s...", nl.ChannelId, port), false)
 	} else {
-		nl.Logger.Error(fmt.Sprintf("Failed to start listener at port %s: %v", port, err), false)
+		nl.Logger.Error(fmt.Sprintf("[%s] Failed to start listener at port %s: %v", nl.ChannelId, port, err), false)
 		return err
 	}
 
@@ -32,6 +33,6 @@ func (nl *NetworkListener) StartListening(wg *sync.WaitGroup, port string) error
 func (nl *NetworkListener) watchForShutdown(wg *sync.WaitGroup) {
 	defer wg.Done()
 	<-nl.ShutdownCh
-	nl.Logger.Info("Received shutdown signal. Shutting down Listener...", false)
+	nl.Logger.Info(fmt.Sprintf("[%s] Received shutdown signal. Shutting down Listener...", nl.ChannelId), false)
 	nl.Listener.Close()
 }

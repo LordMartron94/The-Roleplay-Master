@@ -10,9 +10,8 @@ type Detector struct {
 	ShutdownSigCh chan struct{}
 }
 
-func (d *Detector) StartDetectionLoop(wg *sync.WaitGroup, shutdownSigCh chan struct{}) {
-	port := ":8080"
-	connectionManager, err := NewConnectionManager(d.Logger, shutdownSigCh, port, wg)
+func (d *Detector) StartDetectionLoop(wg *sync.WaitGroup, shutdownSigCh chan struct{}, port string, channelId string) {
+	connectionManager, err := NewConnectionManager(d.Logger, shutdownSigCh, port, wg, channelId)
 
 	if err != nil {
 		d.Logger.Error(err.Error(), false)

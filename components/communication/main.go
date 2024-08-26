@@ -39,7 +39,8 @@ func main() {
 
 	var detector = detection.Detector{Logger: hoornLogger}
 
-	go detector.StartDetectionLoop(&wg, shutdownSigCh)
+	go detector.StartDetectionLoop(&wg, shutdownSigCh, ":8080", "Windows UI Component")
+	go detector.StartDetectionLoop(&wg, shutdownSigCh, ":8000", "Lifecycle Management Component")
 
 	c := make(chan os.Signal, 2)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
