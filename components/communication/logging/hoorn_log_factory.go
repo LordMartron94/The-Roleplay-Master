@@ -13,13 +13,13 @@ func (factory HoornLogFactory) CreateHoornLog(level LogLevel, message string, lo
 		NewHoornLogColorFormatter(),
 	}
 
-	var hoornLog HoornLog = HoornLog{
-		logTime:          currentTime,
-		logLevel:         level,
-		logMessage:       message,
-		formattedMessage: message,
-		logSeparator:     logSeparator,
-	}
+	var hoornLog = NewHoornLog(
+		currentTime,
+		level,
+		message,
+		message,
+		logSeparator,
+	)
 
 	for _, formatter := range formatters {
 		hoornLog.formattedMessage = formatter.Format(hoornLog)

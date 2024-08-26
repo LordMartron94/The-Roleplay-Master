@@ -1,6 +1,8 @@
 package logging
 
 import (
+	"fmt"
+	"log"
 	"time"
 )
 
@@ -18,8 +20,23 @@ type HoornLog struct {
 	formattedMessage string
 
 	// logSeparator is a string representing the distinction between different types of logs.
-	//Different types of log outputs might use this differently.
+	// Different types of log outputs might use this differently.
+	// Max 30 characters for proper formatting.
 	logSeparator string
+}
+
+func NewHoornLog(logTime time.Time, logLevel LogLevel, logMessage string, formattedMessage string, logSeparator string) HoornLog {
+	if len(logSeparator) > 30 {
+		log.Fatalln(fmt.Sprintf("Log separator exceeds maximum length of 15 characters, separator: %s", logSeparator))
+	}
+
+	return HoornLog{
+		logTime:          logTime,
+		logLevel:         logLevel,
+		logMessage:       logMessage,
+		formattedMessage: formattedMessage,
+		logSeparator:     logSeparator,
+	}
 }
 
 func (log HoornLog) GetLogLevel() LogLevel {

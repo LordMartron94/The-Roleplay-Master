@@ -25,7 +25,9 @@ func getLogger() logging.HoornLogger {
 		logging.DefaultHoornLogOutput{},
 		logging.NewFileHoornLogOutput(
 			logDir,
-			5))
+			5,
+			true,
+		))
 }
 
 func main() {
