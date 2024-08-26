@@ -30,7 +30,7 @@ func getLogger() logging.HoornLogger {
 
 func main() {
 	var hoornLogger = getLogger()
-	hoornLogger.Info("Starting communication layer...", false)
+	hoornLogger.Info("Starting communication layer...", false, "Middleman Component")
 
 	shutdownSigCh := make(chan struct{})
 
@@ -47,9 +47,9 @@ func main() {
 
 	select {
 	case <-c:
-		hoornLogger.Info("OS signal catched, Terminating communication layer...", false)
+		hoornLogger.Info("OS signal catched, Terminating communication layer...", false, "Middleman Component")
 	case <-shutdownSigCh:
-		hoornLogger.Info("Shutdown signal received. Terminating communication layer...", false)
+		hoornLogger.Info("Shutdown signal received. Terminating communication layer...", false, "Middleman Component")
 	}
 
 	close(shutdownSigCh)

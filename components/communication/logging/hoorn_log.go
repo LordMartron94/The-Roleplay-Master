@@ -16,6 +16,10 @@ type HoornLog struct {
 
 	// formattedMessage is a pre-formatted string for Output. Optional.
 	formattedMessage string
+
+	// logSeparator is a string representing the distinction between different types of logs.
+	//Different types of log outputs might use this differently.
+	logSeparator string
 }
 
 func (log HoornLog) GetLogLevel() LogLevel {
@@ -36,4 +40,8 @@ func (log HoornLog) GetLogMessage() string {
 
 func (log HoornLog) GetFormattedMessage() string {
 	return log.formattedMessage
+}
+
+func (log HoornLog) GetLogSeparator() string {
+	return log.logSeparator
 }

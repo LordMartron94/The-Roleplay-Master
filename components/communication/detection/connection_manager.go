@@ -29,7 +29,7 @@ func NewConnectionManager(logger logging.HoornLogger, shutdownSigCh chan struct{
 	}
 
 	if err := networkListener.StartListening(wg, port); err != nil {
-		logger.Error(err.Error(), false)
+		logger.Error(err.Error(), false, channelId)
 		return nil, err
 	}
 
@@ -38,9 +38,9 @@ func NewConnectionManager(logger logging.HoornLogger, shutdownSigCh chan struct{
 		Logger:        logger,
 		ShutdownSigCh: shutdownSigCh,
 		ChannelId:     channelId,
-		interpreter:   interpretation.NewInterpreter(logger),
+		interpreter:   interpretation.NewInterpreter(logger, channelId),
 		dataChannel:   make(chan ConnData),
-		actionHandler: handling.NewActionHandler(logger, shutdownSigCh),
+		actionHandler: handling.NewActionHandler(logger, shutdownSigCh, channelId),
 	}, nil
 }
 
@@ -56,7 +56,7 @@ func (cm *ConnectionManager) handleIncomingConnections() {
 			if opErr, ok := err.(*net.OpError); ok && opErr.Err.Error() == "use of closed network connection" {
 				break
 			} else {
-				cm.Logger.Error(fmt.Sprintf("[%s] Error accepting connection: %v", cm.ChannelId, err), false)
+				cm.Logger.Error(fmt.Sprintf("Error accepting connection: %v", err), false, cm.ChannelId)
 			}
 			continue
 		}
@@ -68,7 +68,7 @@ func (cm *ConnectionManager) processDataChannel() {
 	for connData := range cm.dataChannel {
 		rawJson := string(connData.Data)
 
-		cm.Logger.Info(fmt.Sprintf("[%s] Received JSON: %s", cm.ChannelId, rawJson), false)
+		cm.Logger.Info(fmt.Sprintf("Received JSON: %s", rawJson), false, cm.ChannelId)
 
 		request, err := cm.interpreter.Interpret(rawJson)
 		if err != nil {
@@ -77,8 +77,8 @@ func (cm *ConnectionManager) processDataChannel() {
 			continue
 		}
 
-		message := fmt.Sprintf("[%s] Request source %s with action %s", cm.ChannelId, request.Source, request.Actions[0].Name)
-		cm.Logger.Debug(message, false)
+		message := fmt.Sprintf("Request source %s with action %s", request.Source, request.Actions[0].Name)
+		cm.Logger.Debug(message, false, cm.ChannelId)
 
 		responses := cm.actionHandler.HandleRequest(&request)
 		for _, resp := range responses {
@@ -94,10 +94,10 @@ func (cm *ConnectionManager) handleConnection(conn net.Conn) {
 		n, err := conn.Read(buf)
 		if err != nil {
 			if err == io.EOF {
-				cm.Logger.Debug(fmt.Sprintf("[%s] Client disconnected.", cm.ChannelId), false)
+				cm.Logger.Debug(fmt.Sprintf("Client disconnected."), false, cm.ChannelId)
 				break
 			} else {
-				cm.Logger.Error(fmt.Sprintf("[%s] Error reading: %v", cm.ChannelId, err), false)
+				cm.Logger.Error(fmt.Sprintf("Error reading: %v", err), false, cm.ChannelId)
 			}
 			break
 		}
@@ -110,6 +110,6 @@ func (cm *ConnectionManager) SendResponse(conn net.Conn, message string) {
 	response := []byte(message + "\n")
 	_, err := conn.Write(response)
 	if err != nil {
-		cm.Logger.Error(fmt.Sprintf("[%s] Error writing: %v", cm.ChannelId, err), false)
+		cm.Logger.Error(fmt.Sprintf("Error writing: %v", err), false, cm.ChannelId)
 	}
 }

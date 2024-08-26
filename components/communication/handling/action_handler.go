@@ -9,10 +9,11 @@ import (
 type ActionHandler struct {
 	Logger           logging.HoornLogger
 	ShutdownSigCh    chan struct{}
+	ChannelId        string
 	actionHandlerMap map[string]func() *interpretation.Response
 }
 
-func NewActionHandler(logger logging.HoornLogger, shutdownSigCh chan struct{}) *ActionHandler {
+func NewActionHandler(logger logging.HoornLogger, shutdownSigCh chan struct{}, channelId string) *ActionHandler {
 	actionHandlerMap := make(map[string]func() *interpretation.Response)
 	shutdownHandler := &ShutdownHandler{
 		ShutdownSigCh: shutdownSigCh,
@@ -22,12 +23,13 @@ func NewActionHandler(logger logging.HoornLogger, shutdownSigCh chan struct{}) *
 	return &ActionHandler{
 		Logger:           logger,
 		ShutdownSigCh:    shutdownSigCh,
+		ChannelId:        channelId,
 		actionHandlerMap: actionHandlerMap,
 	}
 }
 
 func (h *ActionHandler) HandleRequest(request *interpretation.Request) []*interpretation.Response {
-	h.Logger.Debug(fmt.Sprintf("Handling request for source %s", request.Source), false)
+	h.Logger.Debug(fmt.Sprintf("Handling request for source %s", request.Source), false, h.ChannelId)
 
 	responses := make([]*interpretation.Response, 0)
 
@@ -37,7 +39,7 @@ func (h *ActionHandler) HandleRequest(request *interpretation.Request) []*interp
 				resp := actionFunc()
 				responses = append(responses, resp)
 			} else {
-				h.Logger.Debug(fmt.Sprintf("Received unsupported action %s for source %s", action.Name, request.Source), false)
+				h.Logger.Debug(fmt.Sprintf("Received unsupported action %s for source %s", action.Name, request.Source), false, h.ChannelId)
 				resp := interpretation.InvalidAction(action.Name)
 				responses = append(responses, resp)
 			}

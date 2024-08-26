@@ -14,7 +14,7 @@ func (d *Detector) StartDetectionLoop(wg *sync.WaitGroup, shutdownSigCh chan str
 	connectionManager, err := NewConnectionManager(d.Logger, shutdownSigCh, port, wg, channelId)
 
 	if err != nil {
-		d.Logger.Error(err.Error(), false)
+		d.Logger.Error(err.Error(), false, channelId)
 		return
 	}
 
