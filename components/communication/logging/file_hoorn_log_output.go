@@ -2,7 +2,6 @@ package logging
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -15,15 +14,15 @@ type FileHoornLogOutput struct {
 	logDirectory    string
 	maxLogsToKeep   int
 	createDirectory bool
-	pathToLogTo     string
+	useCombined     bool
 }
 
-func NewFileHoornLogOutput(logDirectory string, maxLogsToKeep int) *FileHoornLogOutput {
+func NewFileHoornLogOutput(logDirectory string, maxLogsToKeep int, useCombined bool) *FileHoornLogOutput {
 	var fileHoornLogOutput = &FileHoornLogOutput{
 		logDirectory:    filepath.Clean(logDirectory),
 		maxLogsToKeep:   maxLogsToKeep,
 		createDirectory: true,
-		pathToLogTo:     "",
+		useCombined:     useCombined,
 	}
 
 	fileHoornLogOutput.initialize()
@@ -31,12 +30,12 @@ func NewFileHoornLogOutput(logDirectory string, maxLogsToKeep int) *FileHoornLog
 	return fileHoornLogOutput
 }
 
-func NewFileHoornLogOutputWithoutCreateDir(logDirectory string, maxLogsToKeep int) *FileHoornLogOutput {
+func NewFileHoornLogOutputWithoutCreateDir(logDirectory string, maxLogsToKeep int, useCombined bool) *FileHoornLogOutput {
 	var fileHoornLogOutput = &FileHoornLogOutput{
 		logDirectory:    filepath.Clean(logDirectory),
 		maxLogsToKeep:   maxLogsToKeep,
 		createDirectory: false,
-		pathToLogTo:     "",
+		useCombined:     useCombined,
 	}
 
 	fileHoornLogOutput.initialize()
@@ -45,29 +44,58 @@ func NewFileHoornLogOutputWithoutCreateDir(logDirectory string, maxLogsToKeep in
 }
 
 func (fhl *FileHoornLogOutput) initialize() {
-	fhl.pathToLogTo = fhl.getPathToLogTo()
-	fhl.validateDirectory(fhl.createDirectory)
+	fhl.validateDirectory(fhl.logDirectory)
 	fhl.incrementLogs()
 }
 
-func (fhl *FileHoornLogOutput) validateDirectory(createDirectory bool) error {
-	_, err := os.Stat(fhl.logDirectory)
+func (fhl *FileHoornLogOutput) validateDirectory(directory string) error {
+	_, err := os.Stat(directory)
 	if os.IsNotExist(err) {
-		if createDirectory {
-			errDir := os.MkdirAll(fhl.logDirectory, 0755)
+		if fhl.createDirectory {
+			errDir := os.MkdirAll(directory, 0755)
 			if errDir != nil {
 				return errDir
 			}
 			return nil
 		}
-		return fmt.Errorf("log directory %v does not exist", fhl.logDirectory)
+		return fmt.Errorf("log directory %v does not exist", directory)
 	}
 	return nil
 }
 
-func (fhl *FileHoornLogOutput) incrementLogs() error {
-	// Assuming getFileChildrenPaths is created as a separate function
-	children, err := getFileChildrenPaths(fhl.logDirectory, ".txt")
+// getSubDirectories will retrieve a list of subdirectories
+func (fhl *FileHoornLogOutput) getSubDirectories() ([]os.DirEntry, error) {
+	return os.ReadDir(fhl.logDirectory)
+}
+
+// handleLogFiles will handle each log file
+func handleLogFile(dirPath, file string, maxLogsToKeep int) error {
+	extension := filepath.Ext(file)
+	name := strings.TrimSuffix(file, extension)
+	splitName := strings.Split(name, "_")
+	logNumber, err := strconv.Atoi(splitName[len(splitName)-1])
+	if err != nil {
+		return err
+	}
+
+	if logNumber+1 > maxLogsToKeep {
+		err := os.Remove(file)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
+	err = os.Rename(file, filepath.Join(dirPath, fmt.Sprintf("log_%v.txt", logNumber+1)))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (fhl *FileHoornLogOutput) handleDir(dir string) error {
+	children, err := getFileChildrenPaths(dir, ".txt")
 	if err != nil {
 		return err
 	}
@@ -75,37 +103,58 @@ func (fhl *FileHoornLogOutput) incrementLogs() error {
 	sort.Sort(sort.Reverse(sort.StringSlice(children)))
 
 	for _, file := range children {
-		extension := filepath.Ext(file)
-		name := strings.TrimSuffix(file, extension)
-		splitName := strings.Split(name, "_")
-		logNumber, err := strconv.Atoi(splitName[len(splitName)-1])
-		if err != nil {
-			return err
-		}
-
-		if logNumber+1 > fhl.maxLogsToKeep {
-			err := os.Remove(file)
-			if err != nil {
-				return err
-			}
-			continue
-		}
-
-		err = os.Rename(file, filepath.Join(fhl.logDirectory, fmt.Sprintf("log_%v.txt", logNumber+1)))
+		err := handleLogFile(dir, file, fhl.maxLogsToKeep)
 		if err != nil {
 			return err
 		}
 	}
+
 	return nil
 }
 
-func (fhl *FileHoornLogOutput) getPathToLogTo() string {
-	return filepath.Join(fhl.logDirectory, fmt.Sprintf("log_%v.txt", 1))
+// incrementLogs will call smaller functions to increment logs
+func (fhl *FileHoornLogOutput) incrementLogs() error {
+	subDirectories, err := fhl.getSubDirectories()
+	if err != nil {
+		return err
+	}
+
+	if fhl.useCombined {
+		err := fhl.handleDir(fhl.logDirectory)
+
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, subDir := range subDirectories {
+		if subDir.IsDir() {
+			err := fhl.handleDir(filepath.Join(fhl.logDirectory, subDir.Name()))
+
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (fhl *FileHoornLogOutput) getPathToLogTo(logSeparator string) string {
+	var directory = fhl.logDirectory
+
+	if logSeparator != "" {
+		directory = filepath.Join(fhl.logDirectory, logSeparator)
+	}
+
+	fhl.validateDirectory(directory)
+
+	return filepath.Join(directory, fmt.Sprintf("log_%v.txt", 1))
 }
 
 func getFileChildrenPaths(directory string, extension string) ([]string, error) {
 	var files []string
-	fileInfo, err := ioutil.ReadDir(directory)
+	fileInfo, err := os.ReadDir(directory)
 	if err != nil {
 		return files, err
 	}
@@ -117,11 +166,10 @@ func getFileChildrenPaths(directory string, extension string) ([]string, error) 
 	return files, nil
 }
 
-func (fhl *FileHoornLogOutput) Output(hoornLog HoornLog) {
-	var formatter = HoornLogTextFormatter{}
-	formattedLog := formatter.Format(hoornLog)
+func (fhl *FileHoornLogOutput) writeLog(formattedLog string, separator string) {
+	var logDirectory = fhl.getPathToLogTo(separator)
 
-	f, err := os.OpenFile(fhl.pathToLogTo, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	f, err := os.OpenFile(logDirectory, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -131,4 +179,20 @@ func (fhl *FileHoornLogOutput) Output(hoornLog HoornLog) {
 	if _, err := f.WriteString(formattedLog + "\n"); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func (fhl *FileHoornLogOutput) Output(hoornLog HoornLog) {
+	var formatter = HoornLogTextFormatter{}
+	formattedLog := formatter.Format(hoornLog)
+	fhl.writeLog(formattedLog, hoornLog.logSeparator)
+
+	if fhl.useCombined {
+		fhl.HandleCombined(hoornLog)
+	}
+}
+
+func (fhl *FileHoornLogOutput) HandleCombined(hoornLog HoornLog) {
+	var formatter = HoornLogTextFormatter{}
+	formattedLog := fmt.Sprintf("[%-30s] ", hoornLog.logSeparator) + formatter.Format(hoornLog)
+	fhl.writeLog(formattedLog, "")
 }

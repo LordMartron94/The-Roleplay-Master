@@ -5,7 +5,7 @@ import "time"
 type HoornLogFactory struct {
 }
 
-func (factory HoornLogFactory) CreateHoornLog(level LogLevel, message string) HoornLog {
+func (factory HoornLogFactory) CreateHoornLog(level LogLevel, message string, logSeparator string) HoornLog {
 	var currentTime time.Time = time.Now()
 
 	var formatters []HoornLogFormatterInterface = []HoornLogFormatterInterface{
@@ -13,12 +13,13 @@ func (factory HoornLogFactory) CreateHoornLog(level LogLevel, message string) Ho
 		NewHoornLogColorFormatter(),
 	}
 
-	var hoornLog HoornLog = HoornLog{
-		logTime:          currentTime,
-		logLevel:         level,
-		logMessage:       message,
-		formattedMessage: message,
-	}
+	var hoornLog = NewHoornLog(
+		currentTime,
+		level,
+		message,
+		message,
+		logSeparator,
+	)
 
 	for _, formatter := range formatters {
 		hoornLog.formattedMessage = formatter.Format(hoornLog)

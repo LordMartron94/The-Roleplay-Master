@@ -26,12 +26,12 @@ func (hL HoornLogger) canOutput(level LogLevel) bool {
 	return level >= hL.minLevel
 }
 
-func (hL HoornLogger) log(level LogLevel, message string, forceShow bool) {
+func (hL HoornLogger) log(level LogLevel, message string, forceShow bool, separator string) {
 	if !hL.canOutput(level) && !forceShow {
 		return
 	}
 
-	var hoornLog = hL.hoornLogFactory.CreateHoornLog(level, message)
+	var hoornLog = hL.hoornLogFactory.CreateHoornLog(level, message, separator)
 
 	for _, output := range hL.outputs {
 		output.Output(hoornLog)
@@ -42,22 +42,22 @@ func (hL HoornLogger) SetMinLevel(level LogLevel) {
 	hL.minLevel = level
 }
 
-func (hL HoornLogger) Debug(message string, forceShow bool) {
-	hL.log(DEBUG, message, forceShow)
+func (hL HoornLogger) Debug(message string, forceShow bool, separator string) {
+	hL.log(DEBUG, message, forceShow, separator)
 }
 
-func (hL HoornLogger) Info(message string, forceShow bool) {
-	hL.log(INFO, message, forceShow)
+func (hL HoornLogger) Info(message string, forceShow bool, separator string) {
+	hL.log(INFO, message, forceShow, separator)
 }
 
-func (hL HoornLogger) Warn(message string, forceShow bool) {
-	hL.log(WARNING, message, forceShow)
+func (hL HoornLogger) Warn(message string, forceShow bool, separator string) {
+	hL.log(WARNING, message, forceShow, separator)
 }
 
-func (hL HoornLogger) Error(message string, forceShow bool) {
-	hL.log(ERROR, message, forceShow)
+func (hL HoornLogger) Error(message string, forceShow bool, separator string) {
+	hL.log(ERROR, message, forceShow, separator)
 }
 
-func (hL HoornLogger) Critical(message string, forceShow bool) {
-	hL.log(CRITICAL, message, forceShow)
+func (hL HoornLogger) Critical(message string, forceShow bool, separator string) {
+	hL.log(CRITICAL, message, forceShow, separator)
 }
